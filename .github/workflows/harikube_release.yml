@@ -1,0 +1,67 @@
+name: Release
+
+on:
+  push:
+    branches:
+    - release-v**
+    - rc-v**
+    - beta-v**
+    - alpha-v**
+    - dev-v**
+
+concurrency: 
+  group: ${{ github.ref_name }}-release
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+  
+jobs:
+  release-kine:
+    runs-on: linux-amd64
+    timeout-minutes: 10
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-go@v5
+      with:
+        go-version-file: go.mod
+        cache-dependency-path: go.sum
+    - name: Extract branch name
+      run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
+      id: extract_branch
+    - name: Validate and build image
+      run: make ci
+      env:
+        REPO: ${{ vars.REGISTRY_USER }}
+        TAG: ${{ github.sha }}
+        VERSION: ${{ steps.extract_branch.outputs.branch }}
+        COMMIT: ${{ github.sha }}
+    - name: Login to registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ vars.REGISTRY }}
+        username: ${{ vars.REGISTRY_USER }}
+        password: ${{ secrets.REGISTRY_TOKEN }}
+    - name: Push image
+      run: |
+        docker tag ${{ vars.REGISTRY_USER }}/kine:${{ github.sha }} ${{ vars.REGISTRY }}/${{ vars.REGISTRY_USER }}/kine:${{ steps.extract_branch.outputs.branch }}
+        docker push ${{ vars.REGISTRY }}/${{ vars.REGISTRY_USER }}/kine:${{ steps.extract_branch.outputs.branch }}
+    - name: Create release
+      if: ${{ !startsWith(github.ref, 'refs/heads/dev-') }}
+      uses: mhmxs/milestone-release-action@main
+      with:
+        milestone-title: ${{ steps.extract_branch.outputs.branch }}
+        pre-body: |
+            # Kine
+            
+            ## Docker
+
+            ```bash
+            docker pull ${{ vars.REGISTRY }}/${{ vars.REGISTRY_USER }}/kine:${{ steps.extract_branch.outputs.branch }}`
+            ```
+
+            ## Release Notes
+
+        draft: true
+        prerelease: ${{ startsWith(github.ref, 'refs/heads/rc-') || startsWith(github.ref, 'refs/heads/beta-') || startsWith(github.ref, 'refs/heads/alpha-') }}
+  

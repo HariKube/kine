@@ -1,0 +1,17 @@
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+featureGates:
+  "WatchList": true
+  "WatchListClient": true
+  "VolumeAttributesClass": true
+  "MutatingAdmissionPolicy": true
+nodes:
+- role: control-plane
+  image: kindest/node:v1.34.0
+  kubeadmConfigPatches:
+  - |
+    kind: ClusterConfiguration
+    apiServer:
+        extraArgs:
+          etcd-servers: "http://172.17.0.1:2369"
+          runtime-config: "admissionregistration.k8s.io/v1beta1=true"
