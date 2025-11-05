@@ -1,6 +1,6 @@
 name: release
 
-# on:
+on:
 #   release:
 #     types:
 #       - created

@@ -1,5 +1,5 @@
 name: Unit Test
-# on:
+on:
 #   push:
 #     branches: [main, master]
 
