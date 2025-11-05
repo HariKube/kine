@@ -60,7 +60,7 @@ jobs:
             ## Docker
 
             ```bash
-            docker pull ${{ vars.REGISTRY }}/${{ vars.REPOSITORY }}/kine:${{ steps.extract_branch.outputs.branch }}`
+            docker pull ${{ vars.REGISTRY }}/${{ vars.REPOSITORY }}/kine:${{ steps.extract_branch.outputs.branch }}
             ```
 
             ## Release Notes
