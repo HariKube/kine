@@ -1,0 +1,99 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kine
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: kine-db-pvc
+  namespace: kine
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kine
+  namespace: kine
+  labels:
+    app: kine
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kine
+  template:
+    metadata:
+      labels:
+        app: kine
+    spec:
+      containers:
+      - name: kine
+        image: quay.io/harikube/kine:#VERSION#
+        imagePullPolicy: IfNotPresent
+        args:
+        - --listen-address=0.0.0.0:2379
+        - --datastore-max-idle-connections=5
+        - --datastore-max-open-connections=90
+        - --datastore-connection-max-lifetime=5m
+        - --endpoint=sqlite:///db/main.db?_journal=WAL&cache=shared
+        ports:
+        - containerPort: 2379
+          name: api-port
+        - containerPort: 8080
+          name: metrics
+        volumeMounts:
+        - name: db-storage
+          mountPath: /db
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsGroup: 0
+          runAsUser: 0
+        resources:
+          limits:
+            memory: 4Gi
+          requests:
+            cpu: 1000m
+            memory: 1Gi
+      volumes:
+      - name: db-storage
+        persistentVolumeClaim:
+          claimName: kine-db-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kine-svc
+  namespace: kine
+spec:
+  type: ClusterIP 
+  selector:
+    app: kine
+  ports:
+    - name: api
+      protocol: TCP
+      port: 2379
+      targetPort: api-port
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kine-metrics
+  namespace: kine
+  labels:
+    app: kine
+    app.kubernetes.io/component: metrics 
+spec:
+  type: ClusterIP 
+  selector:
+    app: kine
+  ports:
+    - name: metrics
+      protocol: TCP
+      port: 8080
+      targetPort: metrics

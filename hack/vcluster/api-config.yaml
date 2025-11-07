@@ -1,0 +1,55 @@
+controlPlane:
+  distro:
+    k8s:
+      enabled: true
+      image:
+        registry: quay.io
+        repository: harikube/kubernetes
+        # tag: v1.34.1
+      imagePullPolicy: IfNotPresent
+      apiServer:
+        enabled: true
+        extraArgs:
+        - --feature-gates=WatchList=true,WatchListClient=true,VolumeAttributesClass=true,MutatingAdmissionPolicy=true
+        - --watch-cache=false
+        - --etcd-servers=http://kine-svc.kine:2379
+        - --runtime-config=admissionregistration.k8s.io/v1beta1=true
+        - --max-requests-inflight=900
+        - --max-mutating-requests-inflight=300
+      controllerManager:
+        enabled: true
+      scheduler:
+        enabled: false
+  coredns:
+    enabled: false
+  backingStore:
+    etcd:
+      deploy:
+        enabled: false
+    database:
+      embedded:
+        enabled: false
+  statefulSet:
+    highAvailability:
+      replicas: 1
+sync:
+  toHost:
+    pods:
+      enabled: false
+    secrets:
+      enabled: false
+    configMaps:
+      enabled: false
+    services:
+      enabled: false
+    endpoints:
+      enabled: false
+    persistentVolumeClaims:
+      enabled: false
+  fromHost:
+    events:
+      enabled: false
+    nodes:
+      enabled: false
+    secrets:
+      enabled: false
