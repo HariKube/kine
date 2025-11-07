@@ -11,12 +11,14 @@ on:
     paths-ignore:
     - "**.md"
     - "**.yaml"
+    - "**.yml"
 
   pull_request:
     branches: [main, master]
     paths-ignore:
     - "**.md"
     - "**.yaml"
+    - "**.yml"
 
 concurrency: 
   group: ${{ github.ref_name }}-unit
