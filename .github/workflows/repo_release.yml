@@ -138,10 +138,54 @@ jobs:
 
             ## Installation
             
-            ### Prerequisets
+            ### Rancher
+
+            ```bash
+            docker run -d \
+              --name harikube_middleware \
+              --net=host \
+              quay.io/harikube/harikube:${{ steps.extract_branch.outputs.branch }} \
+              --listen-address=0.0.0.0:2369 --endpoint='sqlite:///db/main.db?_journal=WAL&cache=shared'
+            ```
+
+            Change your Rancher `/etc/rancher/rke2/config.yaml`:
+
+            ```bash
+            kube-apiserver-image: "quay.io/harikube/kube-apiserver:v1.36.2"
+            kube-apiserver-arg:
+            - "feature-gates=WatchList=true,WatchListClient=true,VolumeAttributesClass=true,MutatingAdmissionPolicy=true,CustomResourceFieldSelectors=true"
+            - "runtime-config=admissionregistration.k8s.io/v1beta1=true,admissionregistration.k8s.io/v1=true"
+            - "storage-media-type=application/json"
+            - "encryption-provider-config="
+            - "encryption-provider-config-automatic-reload=false"
+            - "max-requests-inflight=900"
+            - "max-mutating-requests-inflight=300"
+            - "watch-cache=false"
+            - "etcd-servers=http://172.17.0.1:2369"
+
+            kube-controller-manager-image: "quay.io/harikube/kube-controller-manager:v1.36.2"
+            kube-controller-manager-arg:
+            - "feature-gates=WatchList=true,WatchListClient=true,VolumeAttributesClass=true,MutatingAdmissionPolicy=true,CustomResourceFieldSelectors=true"
+            - "kube-api-burst=90"
+            - "kube-api-qps=60"
+            - "node-cidr-mask-size-ipv4=23"
+            - "terminated-pod-gc-threshold=1000"
+            ```
+
+            And install your cluster just like normaly:
+
+            ```bash
+            curl -sfL https://get.rke2.io | INSTALL_RKE2_VERSION=v1.36.2+rke2r1 sh -
+            ```
+
+            ### Helm
+
+            #### Prerequisets
 
             - Kubernetes cluster; supported versions Vanilla, EKS, AKS, GKE, RKE2, OpenShift >=1.34.0
-            - Adding CRDs if any of the `monitoring.create` is `true` via `kubectl apply -f https://raw.githubusercontent.com/HariKube/harikube-helm-charts/refs/heads/${{ steps.extract_branch.outputs.branch }}/operator-crd.yaml`
+            - Prometheus if any of the monitoring.create is true
+
+            #### Deploy
 
             ```bash
             helm install harikube oci://${{ vars.DOCKER_REGISTRY }}/${{ vars.DOCKER_ORG }}/harikube \
@@ -199,7 +243,7 @@ jobs:
             --set controllerManager.monitoring.create=true
             ```
 
-            ## vCluster connection
+            #### vCluster connection
 
             Connect via vCluster CLI.
 

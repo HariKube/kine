@@ -1,0 +1,104 @@
+diff --git a/harikube/values.yaml b/harikube/values.yaml
+index 836541e..125a2af 100644
+--- a/harikube/values.yaml
++++ b/harikube/values.yaml
+@@ -82,17 +82,12 @@ middleware:
+     app.kubernetes.io/component: harikube-middleware
+   podSecurityContext:
+     runAsNonRoot: true
+-    runAsUser: 65534
+-    runAsGroup: 65534
+-    fsGroup: 65534
+     fsGroupChangePolicy: OnRootMismatch
+     seccompProfile:
+       type: RuntimeDefault
+   securityContext:
+     allowPrivilegeEscalation: false
+     runAsNonRoot: true
+-    runAsUser: 65534
+-    runAsGroup: 65534
+     readOnlyRootFilesystem: true
+     capabilities:
+       drop:
+@@ -199,17 +194,12 @@ operator:
+     app.kubernetes.io/component: harikube-operator
+   podSecurityContext:
+     runAsNonRoot: true
+-    runAsUser: 65534
+-    runAsGroup: 65534
+-    fsGroup: 65534
+     fsGroupChangePolicy: OnRootMismatch
+     seccompProfile:
+       type: RuntimeDefault
+   securityContext:
+     allowPrivilegeEscalation: false
+     runAsNonRoot: true
+-    runAsUser: 65534
+-    runAsGroup: 65534
+     readOnlyRootFilesystem: true
+     capabilities:
+       drop:
+@@ -335,17 +325,13 @@ apiServer:
+     app.kubernetes.io/component: harikube-api-server
+   podSecurityContext:
+     runAsNonRoot: true
+-    runAsUser: 65534
+-    runAsGroup: 65534
+-    fsGroup: 65534
++
+     fsGroupChangePolicy: OnRootMismatch
+     seccompProfile:
+       type: RuntimeDefault
+   securityContext:
+     allowPrivilegeEscalation: false
+     runAsNonRoot: true
+-    runAsUser: 65534
+-    runAsGroup: 65534
+     readOnlyRootFilesystem: true
+     capabilities:
+       drop:
+@@ -464,17 +450,12 @@ controllerManager:
+     app.kubernetes.io/component: harikube-controller-manager
+   podSecurityContext:
+     runAsNonRoot: true
+-    runAsUser: 65534
+-    runAsGroup: 65534
+-    fsGroup: 65534
+     fsGroupChangePolicy: OnRootMismatch
+     seccompProfile:
+       type: RuntimeDefault
+   securityContext:
+     allowPrivilegeEscalation: false
+     runAsNonRoot: true
+-    runAsUser: 65534
+-    runAsGroup: 65534
+     readOnlyRootFilesystem: true
+     capabilities:
+       drop:
+@@ -580,8 +561,6 @@ vcluster:
+         securityContext:
+           allowPrivilegeEscalation: false
+           runAsNonRoot: true
+-          runAsUser: 65534
+-          runAsGroup: 65534
+           readOnlyRootFilesystem: true
+           capabilities:
+             drop:
+@@ -603,17 +582,12 @@ vcluster:
+       security:
+         podSecurityContext:
+           runAsNonRoot: true
+-          runAsUser: 65534
+-          runAsGroup: 65534
+-          fsGroup: 65534
+           fsGroupChangePolicy: OnRootMismatch
+           seccompProfile:
+             type: RuntimeDefault
+         containerSecurityContext:
+           allowPrivilegeEscalation: false
+           runAsNonRoot: true
+-          runAsUser: 65534
+-          runAsGroup: 65534
+           readOnlyRootFilesystem: true
+           capabilities:
+             drop:

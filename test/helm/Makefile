@@ -23,7 +23,9 @@ _deploy:
 		--set apiServer.networkPolicy.create=true \
 		--set controllerManager.create=true \
 		--set controllerManager.monitoring.create=true \
-		--set controllerManager.networkPolicy.create=true
+		--set controllerManager.networkPolicy.create=true \
+		--set middleware.pvc.resources.requests.storage=1G \
+		--set vcluster.controlPlane.statefulSet.persistence.volumeClaim.size=1G
 	kubectl wait -n $(NAMESPACE) --for=jsonpath='{.status.readyReplicas}'=1 statefulset/harikube --timeout=15m
 
 _test:

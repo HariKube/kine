@@ -20,6 +20,9 @@ deps:
 setup-test: cleanup-test
 	vagrant up --provider=libvirt
 
+_setup-test:
+	kubectl apply -f https://github.com/prometheus-operator/prometheus-operator/releases/download/v0.77.1/stripped-down-crds.yaml
+
 _load:
 	docker image save $(REPO)/$(IMAGE_NAME):$(TAG) -o $(TAG).tar
 	vagrant rsync
