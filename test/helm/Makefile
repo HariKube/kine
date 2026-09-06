@@ -14,7 +14,6 @@ _deploy:
 
 	helm install harikube ../../harikube-helm-charts/harikube \
 		--debug \
-		--dependency-update \
 		--namespace $(NAMESPACE) \
 		--set middleware.image.tag=$(TAG) \
 		--set middleware.monitoring.create=true \

@@ -51,10 +51,6 @@ _deploy:
 
 	$(MAKE) _setup-test
 
-	kubectl patch storageclass topolvm-provisioner -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "false"}}}'
-	kubectl apply -f storageclass.yaml --validate=false
-
-
 	vagrant ssh -c "scp -i ~/.crc/machines/crc/id_ed25519 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -P 2222 /vagrant/$(TAG).tar core@127.0.0.1:/home/core"
 	vagrant ssh -c "ssh -i ~/.crc/machines/crc/id_ed25519 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p 2222 core@127.0.0.1 sudo podman load --input /home/core/$(TAG).tar"
 		

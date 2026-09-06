@@ -61,5 +61,4 @@ harikube-release:
 	rm -rf package ; mkdir -p package
 
 	@helm package harikube-helm-charts/harikube \
-		--dependency-update \
 		-d package

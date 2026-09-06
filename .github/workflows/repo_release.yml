@@ -141,19 +141,25 @@ jobs:
             ### Prerequisets
 
             - Kubernetes cluster; supported versions Vanilla, EKS, AKS, GKE, RKE2, OpenShift >=1.34.0
-            - Cert-manager
+            - Adding CRDs if any of the `monitoring.create` is `true` via `kubectl apply -f https://raw.githubusercontent.com/HariKube/harikube-helm-charts/refs/heads/${{ steps.extract_branch.outputs.branch }}/operator-crd.yaml`
 
             ```bash
             helm install harikube oci://${{ vars.DOCKER_REGISTRY }}/${{ vars.DOCKER_ORG }}/harikube \
               --version ${{ steps.extract_version.outputs.version }} \
-              --dependency-update \
               --create-namespace \
-              --namespace harikube
+              --namespace harikube \
+              --set vcluster.exportKubeConfig.server=https://harikube.harikube:443
             kubectl wait -n harikube --for=jsonpath='{.status.readyReplicas}'=1 statefulset/harikube --timeout=5m
             ```
 
             > If you change namespace, please `--set vcluster.exportKubeConfigserver=https://harikube.<NAMESPACE>:443`
             
+            You can integrate services with cert-manager.
+
+            ```bash
+            --set certManagerIntegration.create=true
+            ```
+
             You can enable network policies. You have to create namespace manually, label the namespace and skip `--create-namespace` flag.
 
             ```bash
